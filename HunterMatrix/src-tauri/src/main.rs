@@ -8,7 +8,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::fs;
 use std::path::Path;
-use tauri::{Manager, State, Window};
+use tauri::{Emitter, Manager, State, Window};
 
 mod email_service;
 mod matrix_service;
@@ -784,7 +784,7 @@ async fn get_matrix_config() -> Result<MatrixConfig, String> {
 
     match MatrixService::from_config_file(config_path) {
         Ok(matrix_service) => {
-            let mut config = matrix_service.config.clone();
+            let mut config = matrix_service.config().clone();
             // 隐藏密码
             config.password = "***".to_string();
             Ok(config)
@@ -818,12 +818,12 @@ async fn get_matrix_status() -> Result<serde_json::Value, String> {
             let is_valid = matrix_service.validate_config().is_ok();
 
             Ok(serde_json::json!({
-                "enabled": matrix_service.config.enabled,
+                "enabled": matrix_service.config().enabled,
                 "configured": is_valid,
-                "homeserver": matrix_service.config.homeserver,
-                "username": matrix_service.config.username,
-                "device_name": matrix_service.config.device_name,
-                "rooms_configured": !matrix_service.config.rooms.default_room.is_empty()
+                "homeserver": matrix_service.config().homeserver,
+                "username": matrix_service.config().username,
+                "device_name": matrix_service.config().device_name,
+                "rooms_configured": !matrix_service.config().rooms.default_room.is_empty()
             }))
         }
         Err(_) => {

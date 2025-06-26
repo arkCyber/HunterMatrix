@@ -28,7 +28,7 @@ use std::{
 
 use hex_literal::hex;
 use log::{debug, error};
-use onenote_parser;
+// use onenote_parser;
 
 /// Error enumerates all possible errors returned by this library.
 #[derive(thiserror::Error, Debug)]
@@ -108,45 +108,48 @@ impl<'a> OneNote<'a> {
 
         fn parse_section_buffer(data: &[u8], filename: &Path) -> Result<Vec<ExtractedFile>, Error> {
             let mut embedded_files: Vec<ExtractedFile> = vec![];
-            let mut parser = onenote_parser::Parser::new();
+            // let mut parser = onenote_parser::Parser::new();
+            
+            // Temporary implementation until onenote_parser is available
+            return Err(Error::Parse);
 
-            if let Ok(section) = parser.parse_section_buffer(data, filename) {
-                // file appears to be OneStore 2.8 `.one` file.
-                section.page_series().iter().for_each(|page_series| {
-                    page_series.pages().iter().for_each(|page| {
-                        page.contents().iter().for_each(|page_content| {
-                            if let Some(page_outline) = page_content.outline() {
-                                page_outline.items().iter().for_each(|outline_item| {
-                                    outline_item.element().iter().for_each(|&outline_element| {
-                                        outline_element.contents().iter().for_each(|content| {
-                                            if let Some(embedded_file) = content.embedded_file() {
-                                                let data = embedded_file.data();
-                                                let name = embedded_file.filename();
+            // if let Ok(section) = parser.parse_section_buffer(data, filename) {
+            //     // file appears to be OneStore 2.8 `.one` file.
+            //     section.page_series().iter().for_each(|page_series| {
+            //         page_series.pages().iter().for_each(|page| {
+            //             page.contents().iter().for_each(|page_content| {
+            //                 if let Some(page_outline) = page_content.outline() {
+            //                     page_outline.items().iter().for_each(|outline_item| {
+            //                         outline_item.element().iter().for_each(|&outline_element| {
+            //                             outline_element.contents().iter().for_each(|content| {
+            //                                 if let Some(embedded_file) = content.embedded_file() {
+            //                                     let data = embedded_file.data();
+            //                                     let name = embedded_file.filename();
 
-                                                // If name is empty, set to None.
-                                                let name = if name.is_empty() {
-                                                    debug!("Found unnamed attached file of size {}-bytes", data.len());
-                                                    None
-                                                } else {
-                                                    debug!("Found attached file '{}' of size {}-bytes", name, data.len());
-                                                    Some(name.to_string())
-                                                };
+            //                                     // If name is empty, set to None.
+            //                                     let name = if name.is_empty() {
+            //                                         debug!("Found unnamed attached file of size {}-bytes", data.len());
+            //                                         None
+            //                                     } else {
+            //                                         debug!("Found attached file '{}' of size {}-bytes", name, data.len());
+            //                                         Some(name.to_string())
+            //                                     };
 
-                                                embedded_files.push(ExtractedFile {
-                                                    name,
-                                                    data: data.to_vec(),
-                                                });
-                                            }
-                                        });
-                                    });
-                                });
-                            }
-                        });
-                    });
-                });
-            } else {
-                return Err(Error::Parse);
-            }
+            //                                     embedded_files.push(ExtractedFile {
+            //                                         name,
+            //                                         data: data.to_vec(),
+            //                                     });
+            //                                 }
+            //                             });
+            //                         });
+            //                     });
+            //                 }
+            //             });
+            //         });
+            //     });
+            // } else {
+            //     return Err(Error::Parse);
+            // }
 
             Ok(embedded_files)
         }

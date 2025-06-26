@@ -8,8 +8,9 @@
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](CHANGELOG.md)
-[![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Desktop-lightgrey.svg)](#)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](#)
 [![AI Powered](https://img.shields.io/badge/AI-Powered-purple.svg)](#)
+[![Language](https://img.shields.io/badge/language-Rust%20%7C%20C%20%7C%20Python%20%7C%20JavaScript-orange.svg)](#)
 
 </div>
 
@@ -71,8 +72,8 @@
 
 1. **Clone Repository**
    ```bash
-   git clone https://github.com/arkCyber/MCP-ChatBot.git
-   cd MCP-ChatBot/HunterMatrix
+   git clone https://github.com/arkCyber/HunterMatrix.git
+   cd HunterMatrix
    ```
 
 2. **Start Web Interface**
@@ -211,9 +212,9 @@ This project is licensed under the [MIT License](LICENSE).
 
 ### 📞 Contact & Support
 
-- **GitHub**: [HunterMatrix Repository](https://github.com/arkCyber/MCP-ChatBot)
-- **Issues**: [Report Bugs & Feature Requests](https://github.com/arkCyber/MCP-ChatBot/issues)
-- **Documentation**: [Wiki & Guides](https://github.com/arkCyber/MCP-ChatBot/wiki)
+- **GitHub**: [HunterMatrix Repository](https://github.com/arkCyber/HunterMatrix)
+- **Issues**: [Report Bugs & Feature Requests](https://github.com/arkCyber/HunterMatrix/issues)
+- **Documentation**: [Wiki & Guides](https://github.com/arkCyber/HunterMatrix/wiki)
 
 ---
 
@@ -226,3 +227,222 @@ This project is licensed under the [MIT License](LICENSE).
 Made with ❤️ by the HunterMatrix Team
 
 </div>
+
+## 🚀 项目概述
+
+HunterMatrix 是一个基于 ClamAV 的智能威胁狩猎平台，集成了 AI 安全分析、实时监控、多平台支持等功能。该项目结合了传统杀毒技术与现代 AI 技术，为用户提供全面的安全解决方案。
+
+### ✨ 主要特性
+
+- 🔍 **实时威胁扫描**: 基于 ClamAV 引擎的高效病毒检测
+- 🧠 **AI 安全分析**: 集成机器学习算法进行威胁预测和分析
+- 🎯 **智能威胁狩猎**: 主动发现和追踪高级持续性威胁 (APT)
+- 📊 **可视化报告**: 实时安全状态监控和详细报告生成
+- 🔗 **多平台集成**: 支持 Matrix、Email 等多种通知和通信方式
+- 🖥️ **跨平台支持**: Windows、macOS、Linux 全平台支持
+- 🌐 **Web 界面**: 现代化的 Web 管理界面
+
+## 📁 项目结构
+
+```
+HunterMatrix/
+├── ai-security/           # AI 安全模块
+├── clamav-*/             # ClamAV 核心组件
+├── libclamav_rust/       # Rust 绑定库
+├── src-tauri/            # Tauri 桌面应用
+├── huntermatrix-gui/     # 前端 GUI
+├── web-ui/               # Web 界面
+├── integrations/         # 第三方集成
+├── unit_tests/           # 单元测试
+└── virus_database/       # 病毒数据库
+```
+
+## 🛠️ 技术栈
+
+- **后端**: Rust, C, Python
+- **前端**: TypeScript, React, HTML5/CSS3
+- **桌面应用**: Tauri Framework
+- **数据库**: SQLite, 文件系统
+- **安全引擎**: ClamAV
+- **通信**: Matrix Protocol, SMTP
+- **部署**: Docker, Native Binary
+
+## 📋 安装要求
+
+### 系统要求
+- **操作系统**: Windows 10+, macOS 10.15+, Ubuntu 18.04+
+- **内存**: 最少 4GB RAM，推荐 8GB+
+- **存储**: 至少 2GB 可用空间
+- **网络**: 可选（用于病毒库更新和远程通知）
+
+### 开发环境
+- **Rust**: 1.60+
+- **Node.js**: 16+
+- **Python**: 3.8+
+- **CMake**: 3.14+
+- **Git**: 最新版本
+
+## 🚀 快速开始
+
+### 1. 克隆项目
+```bash
+git clone https://github.com/arkCyber/HunterMatrix.git
+cd HunterMatrix
+```
+
+### 2. 安装依赖
+```bash
+# 安装 Rust 依赖
+cargo check
+
+# 安装前端依赖 (可选)
+cd huntermatrix-gui
+npm install
+```
+
+### 3. 编译项目
+```bash
+# 编译 Rust 组件
+cargo build --release
+
+# 编译桌面应用 (可选)
+cd src-tauri
+cargo tauri build
+```
+
+### 4. 运行项目
+```bash
+# 运行扫描工具
+./clamav_manager.sh
+
+# 或运行桌面应用
+cd src-tauri
+cargo tauri dev
+```
+
+## ⚠️ 当前开发状态
+
+### ✅ 已完成功能
+- ClamAV 核心引擎集成
+- 基础文件扫描功能
+- Rust 绑定库框架
+- Web 界面框架
+- 项目结构搭建
+
+### 🚧 开发中功能
+- AI 威胁分析模块
+- Matrix 通信集成 (API 兼容性问题待解决)
+- 邮件通知系统
+- 实时监控界面
+
+### 📝 已知问题
+1. **Matrix SDK 兼容性**: 当前使用的 matrix-sdk 0.7.1 版本 API 已过时，需要升级到最新版本
+2. **依赖缺失**: 部分私有仓库依赖暂时不可用 (clam-sigutil, onenote_parser)
+3. **配置访问**: 需要完善配置结构的公共 API
+4. **单元测试**: 部分模块的测试覆盖率需要提升
+
+## 🔧 开发指南
+
+### 编译环境设置
+
+1. **修复 Matrix SDK 问题**:
+```bash
+# 升级到最新的 matrix-sdk
+cargo add matrix-sdk@latest
+```
+
+2. **解决依赖问题**:
+```bash
+# 临时注释掉不可用的依赖
+# 等待私有仓库访问权限或寻找替代方案
+```
+
+3. **运行测试**:
+```bash
+cargo test --workspace
+```
+
+### 代码贡献指南
+
+1. Fork 项目并创建特性分支
+2. 遵循现有代码风格和注释规范
+3. 添加适当的单元测试
+4. 确保所有测试通过: `cargo test`
+5. 提交 Pull Request
+
+### 代码规范
+- 所有公共函数必须有详细的文档注释
+- 使用 `cargo fmt` 格式化代码
+- 使用 `cargo clippy` 检查代码质量
+- 错误处理必须完善，避免 panic
+- 重要操作需要添加日志记录
+
+## 📖 API 文档
+
+### Rust API
+```rust
+// 扫描单个文件
+let result = scan_file("/path/to/file")?;
+
+// 批量扫描
+let results = scan_directory("/path/to/directory")?;
+
+// 发送威胁告警
+matrix_service.send_threat_alert(&threat_info).await?;
+```
+
+### Web API
+```javascript
+// 获取扫描状态
+GET /api/scan/status
+
+// 启动扫描
+POST /api/scan/start
+{
+  "path": "/path/to/scan",
+  "deep_scan": true
+}
+```
+
+## 🤝 贡献者
+
+- **arkSong** - 项目维护者和主要开发者
+- **HunterMatrix Team** - 核心开发团队
+
+## 📄 许可证
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 🆘 获取帮助
+
+- **问题报告**: [GitHub Issues](https://github.com/arkCyber/HunterMatrix/issues)
+- **功能请求**: [GitHub Discussions](https://github.com/arkCyber/HunterMatrix/discussions)
+- **文档**: [项目 Wiki](https://github.com/arkCyber/HunterMatrix/wiki)
+
+## 🎯 路线图
+
+### v1.0.0 (目标: 2025年Q1)
+- [ ] 完善核心扫描功能
+- [ ] 修复所有已知编译问题
+- [ ] 实现基础 AI 分析
+- [ ] 完成 Web 界面
+
+### v1.1.0 (目标: 2025年Q2)
+- [ ] Matrix 通信集成
+- [ ] 邮件通知系统
+- [ ] 实时监控和告警
+- [ ] 移动端支持
+
+### v2.0.0 (目标: 2025年Q3)
+- [ ] 高级威胁狩猎
+- [ ] 企业级功能
+- [ ] 云端集成
+- [ ] 多租户支持
+
+## ⭐ Star History
+
+如果这个项目对您有帮助，请给我们一个 Star！
+
+---
+
+**注意**: 这是一个正在积极开发的项目。某些功能可能不稳定或不完整。我们欢迎社区贡献和反馈！

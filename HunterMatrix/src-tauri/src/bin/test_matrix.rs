@@ -1,4 +1,4 @@
-use clamav_ai_security::matrix_service::{MatrixService, MatrixConfig, ThreatInfo, ReportData};
+use huntermatrix::matrix_service::{MatrixService, MatrixConfig, ThreatInfo, ReportData};
 use std::env;
 
 #[tokio::main]

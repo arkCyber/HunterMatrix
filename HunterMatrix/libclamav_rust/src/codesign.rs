@@ -37,11 +37,11 @@ use openssl::{
     },
 };
 
-use clam_sigutil::{
-    sigbytes::{AppendSigBytes, SigBytes},
-    signature::{digital_sig::DigitalSig, parse_from_cvd_with_meta},
-    SigType, Signature,
-};
+// use clam_sigutil::{
+//     sigbytes::{AppendSigBytes, SigBytes},
+//     signature::{digital_sig::DigitalSig, parse_from_cvd_with_meta},
+//     SigType, Signature,
+// };
 
 use log::{debug, error, warn};
 
@@ -71,7 +71,7 @@ pub enum Error {
     OpenSSLError(#[from] openssl::error::ErrorStack),
 
     #[error("Error converting digital signature to .sign file line: {0}")]
-    SigBytesError(#[from] clam_sigutil::signature::ToSigBytesError),
+    SigBytesError(String), // #[from] clam_sigutil::signature::ToSigBytesError),
 
     #[error("Error verifying signature: {0}")]
     InvalidDigitalSignature(String),
@@ -203,9 +203,12 @@ where
     let pkcs7 = signer.sign(&data)?;
 
     // Now convert the pkcs7 to a DigitalSig struct which may be converted to a .sign file signature line.
-    let signature = DigitalSig::Pkcs7(pkcs7);
-    let mut sig_bytes: SigBytes = SigBytes::new();
-    signature.append_sigbytes(&mut sig_bytes)?;
+    // let signature = DigitalSig::Pkcs7(pkcs7);
+    // let mut sig_bytes: SigBytes = SigBytes::new();
+    // signature.append_sigbytes(&mut sig_bytes)?;
+    
+    // Temporary implementation until clam_sigutil is available
+    return Err(Error::SignFailed("clam_sigutil dependency is not available".to_string()));
 
     let mut writer = {
         let mut options = std::fs::OpenOptions::new();
@@ -238,7 +241,7 @@ where
         writer
     };
 
-    writer.write_all(sig_bytes.as_bytes())?;
+    // writer.write_all(sig_bytes.as_bytes())?;
 
     // Write a newline after the signature
     writer.write_all(b"\n")?;
@@ -439,61 +442,64 @@ pub fn verify_signed_file(
         // Convert line to bytes, which is preferred by our signature parser.
         let data = line.as_bytes();
 
-        match parse_from_cvd_with_meta(SigType::DigitalSignature, &data.into()) {
-            Ok((sig, meta)) => {
-                let sig = sig.downcast::<DigitalSig>().unwrap();
+        // match parse_from_cvd_with_meta(SigType::DigitalSignature, &data.into()) {
+        //     Ok((sig, meta)) => {
+        //         let sig = sig.downcast::<DigitalSig>().unwrap();
+        
+        // Temporary implementation until clam_sigutil is available
+        return Err(Error::CannotVerify("clam_sigutil dependency is not available".to_string()));
 
-                sig.validate(&meta).map_err(|e| {
-                    Error::CannotVerify(format!(
-                        "{:?}:{}: Invalid signature: {}",
-                        signature_file_path, index, e
-                    ))
-                })?;
+                // sig.validate(&meta).map_err(|e| {
+                //     Error::CannotVerify(format!(
+                //         "{:?}:{}: Invalid signature: {}",
+                //         signature_file_path, index, e
+                //     ))
+                // })?;
 
-                // verify the flevel bounds of this signature compared with the current flevel
-                let current_flevel = unsafe { cl_retflevel() };
-                let sig_flevel_range = meta.f_level.unwrap();
-                if !sig_flevel_range.contains(&current_flevel) {
-                    debug!(
-                        "{:?}:{}: Signature feature level range {:?} does not include current feature level {}",
-                        signature_file_path, index, sig_flevel_range, current_flevel
-                    );
-                    continue;
-                }
+                // // verify the flevel bounds of this signature compared with the current flevel
+                // let current_flevel = unsafe { cl_retflevel() };
+                // let sig_flevel_range = meta.f_level.unwrap();
+                // if !sig_flevel_range.contains(&current_flevel) {
+                //     debug!(
+                //         "{:?}:{}: Signature feature level range {:?} does not include current feature level {}",
+                //         signature_file_path, index, sig_flevel_range, current_flevel
+                //     );
+                //     continue;
+                // }
 
-                match *sig {
-                    DigitalSig::Pkcs7(pkcs7) => {
-                        match verifier.verify(&file_data, &pkcs7) {
-                            Ok(signer) => {
-                                return Ok(signer);
-                            }
-                            Err(Error::InvalidDigitalSignature(m)) => {
-                                warn!(
-                                    "Invalid digital signature for {:?}: {}",
-                                    signed_file_path, m
-                                );
-                                return Err(Error::InvalidDigitalSignature(m));
-                            }
-                            Err(e) => {
-                                debug!(
-                                    "Error verifying signature with the certs found in {:?}: {:?}",
-                                    verifier.certs_directory, e
-                                );
+                // // match *sig {
+                // //     DigitalSig::Pkcs7(pkcs7) => {
+                //         match verifier.verify(&file_data, &pkcs7) {
+                //             Ok(signer) => {
+                //                 return Ok(signer);
+                //             }
+                //             Err(Error::InvalidDigitalSignature(m)) => {
+                //                 warn!(
+                //                     "Invalid digital signature for {:?}: {}",
+                //                     signed_file_path, m
+                //                 );
+                //                 return Err(Error::InvalidDigitalSignature(m));
+                //             }
+                //             Err(e) => {
+                //                 debug!(
+                //                     "Error verifying signature with the certs found in {:?}: {:?}",
+                //                     verifier.certs_directory, e
+                //                 );
 
-                                // Try the next certificate
-                            }
-                        }
-                    }
-                }
-            }
-            Err(e) => {
-                eprintln!(
-                    "{:?}:{}: Error parsing signature: {}",
-                    signature_file_path, index, e
-                );
-                return Err(Error::CannotVerify(e.to_string()));
-            }
-        };
+                //                 // Try the next certificate
+                //             }
+                //         }
+                //     }
+                // }
+            // }
+            // Err(e) => {
+            //     eprintln!(
+            //         "{:?}:{}: Error parsing signature: {}",
+            //         signature_file_path, index, e
+            //     );
+            //     return Err(Error::CannotVerify(e.to_string()));
+            // }
+        // };
     }
 
     Err(Error::CannotVerify(

@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 use std::fs;
-use clamav_ai_security::email_service::{EmailConfig, EmailProvider, SmtpConfig, AuthConfig, SenderConfig, RecipientsConfig, TemplateConfig, RetryConfig};
+use huntermatrix::email_service::{EmailConfig, EmailProvider, SmtpConfig, AuthConfig, SenderConfig, RecipientsConfig, TemplateConfig, RetryConfig};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("╔══════════════════════════════════════════════════════════════╗");

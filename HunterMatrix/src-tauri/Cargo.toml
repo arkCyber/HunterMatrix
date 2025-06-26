@@ -90,5 +90,3 @@ path = "src/bin/setup_matrix.rs"
 [[bin]]
 name = "test_matrix"
 path = "src/bin/test_matrix.rs"
-
-[workspace]

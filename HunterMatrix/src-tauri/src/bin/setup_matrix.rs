@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 use std::fs;
-use clamav_ai_security::matrix_service::{MatrixConfig, RoomConfig, MessageFormat, RetryConfig};
+use huntermatrix::matrix_service::{MatrixConfig, RoomConfig, MessageFormat, RetryConfig};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("╔══════════════════════════════════════════════════════════════╗");

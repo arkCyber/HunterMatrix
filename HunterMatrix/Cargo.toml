@@ -1,8 +1,7 @@
 [workspace]
+resolver = "2"
 
-members = [
-    "libhuntermatrix_rust",
-]
+members = ["libclamav_rust", "src-tauri"]
 
 [profile.dev.package."*"]
 opt-level = 2

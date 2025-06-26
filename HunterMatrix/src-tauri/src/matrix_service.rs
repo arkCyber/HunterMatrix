@@ -98,6 +98,16 @@ impl MatrixService {
         }
     }
 
+    /// 获取配置引用
+    pub fn config(&self) -> &MatrixConfig {
+        &self.config
+    }
+
+    /// 获取可变配置引用
+    pub fn config_mut(&mut self) -> &mut MatrixConfig {
+        &mut self.config
+    }
+
     /// 从配置文件加载Matrix服务
     pub fn from_config_file<P: AsRef<Path>>(config_path: P) -> Result<Self> {
         let config_content = fs::read_to_string(config_path)?;
@@ -114,31 +124,36 @@ impl MatrixService {
 
         let homeserver_url = Url::parse(&self.config.homeserver)?;
         
-        let client = ClientBuilder::new()
-            .homeserver_url(homeserver_url)
-            .build()
-            .await?;
+        // TODO: Fix matrix-sdk version compatibility
+        // let client = ClientBuilder::new()
+        //     .homeserver_url(homeserver_url)
+        //     .build()
+        //     .await?;
 
-        // 登录
-        client
-            .login_username(&self.config.username, &self.config.password)
-            .device_id(&self.config.device_name)
-            .send()
-            .await?;
+        // // 登录
+        // client
+        //     .login_username(&self.config.username, &self.config.password)
+        //     .device_id(&self.config.device_name)
+        //     .send()
+        //     .await?;
 
-        info!("Matrix客户端登录成功: {}", self.config.username);
+        // info!("Matrix客户端登录成功: {}", self.config.username);
 
-        // 启动同步
-        let sync_settings = SyncSettings::default().token(client.sync_token().await);
-        tokio::spawn({
-            let client = client.clone();
-            async move {
-                client.sync(sync_settings).await;
-            }
-        });
+        // // 启动同步
+        // let sync_settings = SyncSettings::default().token(client.sync_token().await);
+        
+        warn!("Matrix service temporarily disabled due to SDK version incompatibility");
+        return Err(anyhow!("Matrix SDK version incompatibility"));
+        
+        // tokio::spawn({
+        //     let client = client.clone();
+        //     async move {
+        //         client.sync(sync_settings).await;
+        //     }
+        // });
 
-        self.client = Some(client);
-        Ok(())
+        // self.client = Some(client);
+        // Ok(())
     }
 
     /// 发送每日报告
