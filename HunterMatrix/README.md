@@ -1,3 +1,11 @@
+# 🛡️ HunterMatrix AI 智能安全平台
+
+[![GitHub Status](https://img.shields.io/github/languages/top/arkCyber/HunterMatrix)](https://github.com/arkCyber/HunterMatrix)
+[![Repository Size](https://img.shields.io/github/repo-size/arkCyber/HunterMatrix)](https://github.com/arkCyber/HunterMatrix)
+[![Last Commit](https://img.shields.io/github/last-commit/arkCyber/HunterMatrix)](https://github.com/arkCyber/HunterMatrix)
+
+> **🔄 状态更新:** 如果GitHub页面显示错误，请刷新浏览器或等待几分钟。大型仓库有时需要时间加载。
+
 # 🎯 HunterMatrix - Intelligent Threat Hunting Platform
 
 <div align="center">
@@ -9,7 +17,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](CHANGELOG.md)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](#)
-[![AI Powered](https://img.shields.io/badge/AI-Powered-purple.svg)](#)
+[![AI Powered](https://img.shields.io/badge/AI-Powered-purple.svg)](https://github.com/arkCyber/HunterMatrix)
 [![Language](https://img.shields.io/badge/language-Rust%20%7C%20C%20%7C%20Python%20%7C%20JavaScript-orange.svg)](#)
 
 </div>
