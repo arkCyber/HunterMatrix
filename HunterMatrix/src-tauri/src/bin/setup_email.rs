@@ -40,7 +40,7 @@ fn interactive_setup() -> Result<EmailConfig, Box<dyn std::error::Error>> {
     // 创建配置
     let config = EmailConfig {
         enabled: true,
-        provider,
+        provider: provider.clone(),
         smtp: get_default_smtp_config(&provider),
         auth,
         sender,

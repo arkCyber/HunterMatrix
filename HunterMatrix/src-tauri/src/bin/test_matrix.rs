@@ -34,7 +34,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     println!("✅ 配置验证通过");
     
-    if !matrix_service.config.enabled {
+    if !matrix_service.config().enabled {
         println!("⚠️  Matrix服务已禁用");
         return Ok(());
     }
@@ -81,7 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn test_message(matrix_service: &MatrixService) -> Result<(), Box<dyn std::error::Error>> {
-    let room_id = &matrix_service.config.rooms.default_room;
+    let room_id = &matrix_service.config().rooms.default_room;
     
     if room_id.is_empty() {
         println!("❌ 默认房间ID未配置");

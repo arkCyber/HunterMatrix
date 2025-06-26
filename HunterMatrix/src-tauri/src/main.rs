@@ -845,7 +845,7 @@ async fn send_matrix_daily_report(scan_result: ScanResult) -> Result<String, Str
 
     match MatrixService::from_config_file(config_path) {
         Ok(mut matrix_service) => {
-            if !matrix_service.config.enabled {
+            if !matrix_service.config().enabled {
                 return Ok("Matrix服务已禁用".to_string());
             }
 
@@ -893,7 +893,7 @@ async fn send_matrix_threat_alert(threat_type: String, file_path: String, severi
 
     match MatrixService::from_config_file(config_path) {
         Ok(mut matrix_service) => {
-            if !matrix_service.config.enabled {
+            if !matrix_service.config().enabled {
                 return Ok("Matrix服务已禁用".to_string());
             }
 
@@ -926,7 +926,7 @@ async fn get_matrix_rooms() -> Result<Vec<String>, String> {
 
     match MatrixService::from_config_file(config_path) {
         Ok(mut matrix_service) => {
-            if !matrix_service.config.enabled {
+            if !matrix_service.config().enabled {
                 return Ok(vec![]);
             }
 
