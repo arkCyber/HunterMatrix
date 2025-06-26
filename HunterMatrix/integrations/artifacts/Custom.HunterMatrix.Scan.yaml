@@ -1,0 +1,122 @@
+name: Custom.HunterMatrix.Scan
+description: |
+  使用HunterMatrix扫描指定Path的File，Detection恶意Software
+  
+  这个工件集成了HunterMatrix反病毒引擎，可以：
+  - 扫描指定Path的File
+  - DetectionAlready知的恶意Software
+  - 生成详细的扫描Report
+  - 支持递归Scan Directory
+
+author: HunterMatrix Integration Team
+version: 1.0
+
+parameters:
+  - name: TargetPath
+    description: "要扫描的File或DirectoryPath"
+    default: "C:\\Users\\**\\Downloads\\*"
+    type: string
+    
+  - name: Recursive
+    description: "是否递归扫描子Directory"
+    default: true
+    type: bool
+    
+  - name: DatabasePath
+    description: "HunterMatrix病毒LibraryPath"
+    default: "/var/lib/huntermatrix"
+    type: string
+    
+  - name: MaxFileSize
+    description: "最大扫描FileSize(MB)"
+    default: 100
+    type: int
+    
+  - name: FileExtensions
+    description: "要扫描的File扩展名(逗号分隔)"
+    default: "exe,dll,scr,bat,cmd,com,pif,vbs,js"
+    type: string
+
+sources:
+  - query: |
+      -- 获取要扫描的File列Table
+      LET file_list = SELECT FullPath, Size, Mtime, Atime, 
+                             hash(path=FullPath, hashselect="MD5") AS MD5,
+                             hash(path=FullPath, hashselect="SHA1") AS SHA1
+      FROM glob(globs=TargetPath)
+      WHERE NOT IsDir 
+        AND Size < MaxFileSize * 1024 * 1024
+        AND if(condition=FileExtensions,
+               then=FullPath =~ ("\\\\(" + regex_replace(
+                   source=FileExtensions, 
+                   re=",", 
+                   replace="|") + ")$"),
+               else=TRUE)
+      
+      -- ExecuteHunterMatrix扫描
+      LET scan_results = SELECT *, 
+        shell(cmd="clamscan", 
+              args=["--database=" + DatabasePath,
+                    "--no-summary",
+                    "--infected",
+                    FullPath]) AS ScanOutput
+      FROM file_list
+      
+      -- 解析扫描Result
+      SELECT FullPath,
+             Size,
+             Mtime,
+             MD5,
+             SHA1,
+             ScanOutput.ReturnCode AS ScanReturnCode,
+             ScanOutput.Stdout AS ScanStdout,
+             ScanOutput.Stderr AS ScanStderr,
+             if(condition=ScanOutput.ReturnCode = 1,
+                then="INFECTED",
+                else=if(condition=ScanOutput.ReturnCode = 0,
+                       then="CLEAN",
+                       else="ERROR")) AS ScanStatus,
+             regex_replace(source=ScanOutput.Stdout,
+                          re=".*: (.+) FOUND.*",
+                          replace="$1") AS ThreatName,
+             timestamp(epoch=now()) AS ScanTime
+      FROM scan_results
+      WHERE ScanOutput.ReturnCode != 0 OR ScanStatus = "INFECTED"
+
+reports:
+  - type: CLIENT
+    template: |
+      # HunterMatrix 扫描Report
+      
+      **扫描Parameters:**
+      - 目标Path: {{ .Parameters.TargetPath }}
+      - 递归扫描: {{ .Parameters.Recursive }}
+      - 病毒LibraryPath: {{ .Parameters.DatabasePath }}
+      - 最大FileSize: {{ .Parameters.MaxFileSize }}MB
+      - File扩展名: {{ .Parameters.FileExtensions }}
+      
+      **扫描Result:**
+      
+      {{ range .Query }}
+      {{ if eq .ScanStatus "INFECTED" }}
+      ## ⚠️ Found威胁
+      
+      - **FilePath:** `{{ .FullPath }}`
+      - **威胁Name:** `{{ .ThreatName }}`
+      - **FileSize:** {{ .Size }} 字节
+      - **MD5:** `{{ .MD5 }}`
+      - **SHA1:** `{{ .SHA1 }}`
+      - **ModifyTime:** {{ .Mtime }}
+      - **扫描Time:** {{ .ScanTime }}
+      
+      {{ else if eq .ScanStatus "ERROR" }}
+      ## ❌ 扫描Error
+      
+      - **FilePath:** `{{ .FullPath }}`
+      - **ErrorInformation:** `{{ .ScanStderr }}`
+      
+      {{ end }}
+      {{ end }}
+      
+      ---
+      *Report生成Time: {{ timestamp(epoch=now()) }}*

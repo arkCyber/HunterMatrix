@@ -1,0 +1,63 @@
+# AISecurityReport邮件ServiceConfiguration
+
+# 基本Settings
+enabled = false  # 是否启用邮件Send功能
+provider = "Gmail"  # 邮件Service提供商: Gmail, Outlook, Yahoo, QQ, NetEase163, Custom
+
+# SMTPService器Configuration (当provider为Custom时使用)
+[smtp]
+server = "smtp.gmail.com"
+port = 587
+use_tls = true
+use_ssl = false
+
+# AuthenticationInformation
+[auth]
+username = ""  # 发件人邮箱
+password = ""  # 邮箱Password或Application专用Password
+
+# 发件人Information
+[sender]
+name = "AISecurity助手"
+email = ""
+
+# 收件人Configuration
+[recipients]
+# Default收件人 (用于一般Report)
+default = []
+
+# 紧急联系人 (用于高危威胁告警)
+emergency = []
+
+# Report收件人 (用于定期Report)
+reports = []
+
+# 邮件TemplateConfiguration
+[templates]
+daily_report = "daily_report"
+weekly_report = "weekly_report"
+threat_alert = "threat_alert"
+emergency_alert = "emergency_alert"
+
+# 重试Configuration
+[retry]
+max_attempts = 3
+delay_seconds = 5
+
+# ExampleConfiguration (请根据实际情况Modify)
+# 
+# enabled = true
+# provider = "Gmail"
+# 
+# [auth]
+# username = "your-email@gmail.com"
+# password = "your-app-password"
+# 
+# [sender]
+# name = "AISecurity助手"
+# email = "security@yourcompany.com"
+# 
+# [recipients]
+# default = ["admin@yourcompany.com", "it-team@yourcompany.com"]
+# emergency = ["emergency@yourcompany.com", "ciso@yourcompany.com"]
+# reports = ["security-team@yourcompany.com", "management@yourcompany.com"]

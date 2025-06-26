@@ -1,0 +1,257 @@
+name: Custom.ThreatHunt.HunterMatrix
+description: |
+  威胁狩猎工件 - 结合Velociraptor行为Analysis和HunterMatrix恶意SoftwareDetection
+  
+  这个工件实现了主动威胁狩猎，Package括：
+  - Detection可疑FileOperation
+  - AnalysisProcess行为
+  - Automatic触发HunterMatrix扫描
+  - 生成威胁情报Report
+
+author: Threat Hunting Team
+version: 1.0
+
+parameters:
+  - name: HuntMode
+    description: "狩猎模式"
+    default: "comprehensive"
+    type: choices
+    choices:
+      - comprehensive: "全面狩猎"
+      - suspicious_files: "可疑File"
+      - process_analysis: "ProcessAnalysis"
+      - network_artifacts: "Network工件"
+    
+  - name: TimeRange
+    description: "Time范围(小时)"
+    default: 24
+    type: int
+    
+  - name: HunterMatrixDatabase
+    description: "HunterMatrix病毒LibraryPath"
+    default: "/var/lib/huntermatrix"
+    type: string
+
+sources:
+  - name: SuspiciousFiles
+    query: |
+      -- Detection可疑File
+      LET suspicious_files = SELECT FullPath, Size, Mtime, Atime,
+                                   hash(path=FullPath, hashselect="MD5") AS MD5,
+                                   hash(path=FullPath, hashselect="SHA256") AS SHA256
+      FROM glob(globs=[
+        "C:\\Users\\**\\Downloads\\*.exe",
+        "C:\\Users\\**\\AppData\\**\\*.exe",
+        "C:\\Temp\\*.exe",
+        "C:\\Windows\\Temp\\*.exe",
+        "C:\\ProgramData\\**\\*.exe"
+      ])
+      WHERE Mtime > timestamp(epoch=now() - TimeRange * 3600)
+        AND Size > 1000  -- 大于1KB
+        AND Size < 100 * 1024 * 1024  -- 小于100MB
+      
+      -- 对可疑FileExecuteHunterMatrix扫描
+      LET scan_results = SELECT *,
+        shell(cmd="clamscan",
+              args=["--database=" + HunterMatrixDatabase,
+                    "--no-summary",
+                    "--infected",
+                    FullPath]) AS HunterMatrixScan
+      FROM suspicious_files
+      
+      SELECT FullPath,
+             Size,
+             Mtime,
+             MD5,
+             SHA256,
+             HunterMatrixScan.ReturnCode AS ScanResult,
+             if(condition=HunterMatrixScan.ReturnCode = 1,
+                then="MALWARE_DETECTED",
+                else="CLEAN") AS ThreatStatus,
+             regex_replace(source=HunterMatrixScan.Stdout,
+                          re=".*: (.+) FOUND.*",
+                          replace="$1") AS MalwareName,
+             "suspicious_file" AS HuntType
+      FROM scan_results
+      WHERE HuntMode = "suspicious_files" OR HuntMode = "comprehensive"
+
+  - name: ProcessAnalysis
+    query: |
+      -- Analysis可疑Process
+      LET suspicious_processes = SELECT Pid, Ppid, Name, CommandLine, Exe,
+                                       Username, CreateTime
+      FROM pslist()
+      WHERE (
+        -- Detection可疑Process名
+        Name =~ "(?i)(temp|tmp|cache|update|install|setup|download)" OR
+        -- Detection可疑Path
+        Exe =~ "(?i)(temp|tmp|appdata|programdata)" OR
+        -- Detection可疑Command行
+        CommandLine =~ "(?i)(powershell|cmd|wscript|cscript|regsvr32|rundll32)"
+      )
+      AND CreateTime > timestamp(epoch=now() - TimeRange * 3600)
+      
+      -- 扫描Process可ExecuteFile
+      LET process_scan = SELECT *,
+        shell(cmd="clamscan",
+              args=["--database=" + HunterMatrixDatabase,
+                    "--no-summary",
+                    "--infected",
+                    Exe]) AS ProcessScan
+      FROM suspicious_processes
+      WHERE Exe
+      
+      SELECT Pid,
+             Name,
+             CommandLine,
+             Exe,
+             Username,
+             CreateTime,
+             ProcessScan.ReturnCode AS ScanResult,
+             if(condition=ProcessScan.ReturnCode = 1,
+                then="MALICIOUS_PROCESS",
+                else="CLEAN_PROCESS") AS ThreatStatus,
+             regex_replace(source=ProcessScan.Stdout,
+                          re=".*: (.+) FOUND.*",
+                          replace="$1") AS MalwareName,
+             "process_analysis" AS HuntType
+      FROM process_scan
+      WHERE HuntMode = "process_analysis" OR HuntMode = "comprehensive"
+
+  - name: NetworkArtifacts
+    query: |
+      -- DetectionNetwork相关的可疑File
+      LET network_files = SELECT FullPath, Size, Mtime,
+                                hash(path=FullPath, hashselect="MD5") AS MD5
+      FROM glob(globs=[
+        "C:\\Users\\**\\Downloads\\*.zip",
+        "C:\\Users\\**\\Downloads\\*.rar",
+        "C:\\Users\\**\\Downloads\\*.7z",
+        "C:\\Users\\**\\Downloads\\*.tar",
+        "C:\\Users\\**\\Downloads\\*.gz"
+      ])
+      WHERE Mtime > timestamp(epoch=now() - TimeRange * 3600)
+        AND Size > 1024  -- 大于1KB
+      
+      -- 扫描压缩File
+      LET archive_scan = SELECT *,
+        shell(cmd="clamscan",
+              args=["--database=" + HunterMatrixDatabase,
+                    "--no-summary",
+                    "--infected",
+                    "--scan-archive",
+                    FullPath]) AS ArchiveScan
+      FROM network_files
+      
+      SELECT FullPath,
+             Size,
+             Mtime,
+             MD5,
+             ArchiveScan.ReturnCode AS ScanResult,
+             if(condition=ArchiveScan.ReturnCode = 1,
+                then="MALICIOUS_ARCHIVE",
+                else="CLEAN_ARCHIVE") AS ThreatStatus,
+             regex_replace(source=ArchiveScan.Stdout,
+                          re=".*: (.+) FOUND.*",
+                          replace="$1") AS MalwareName,
+             "network_artifacts" AS HuntType
+      FROM archive_scan
+      WHERE HuntMode = "network_artifacts" OR HuntMode = "comprehensive"
+
+  - name: ThreatSummary
+    query: |
+      -- 汇总威胁Information
+      LET all_threats = SELECT * FROM chain(
+        a={ SELECT * FROM source(source="SuspiciousFiles") WHERE ThreatStatus = "MALWARE_DETECTED" },
+        b={ SELECT * FROM source(source="ProcessAnalysis") WHERE ThreatStatus = "MALICIOUS_PROCESS" },
+        c={ SELECT * FROM source(source="NetworkArtifacts") WHERE ThreatStatus = "MALICIOUS_ARCHIVE" }
+      )
+      
+      SELECT count() AS TotalThreats,
+             enumerate(items=MalwareName) AS ThreatTypes,
+             enumerate(items=HuntType) AS HuntCategories,
+             min(item=Mtime) AS EarliestThreat,
+             max(item=Mtime) AS LatestThreat,
+             timestamp(epoch=now()) AS HuntTime
+      FROM all_threats
+
+reports:
+  - type: CLIENT
+    template: |
+      # 🦖 威胁狩猎Report - HunterMatrix集成
+      
+      **狩猎Parameters:**
+      - 狩猎模式: {{ .Parameters.HuntMode }}
+      - Time范围: {{ .Parameters.TimeRange }} 小时
+      - HunterMatrixDataLibrary: {{ .Parameters.HunterMatrixDatabase }}
+      
+      ## 📊 威胁摘要
+      
+      {{ range .ThreatSummary }}
+      - **Found威胁Total:** {{ .TotalThreats }}
+      - **威胁Type:** {{ join .ThreatTypes ", " }}
+      - **狩猎Class别:** {{ join .HuntCategories ", " }}
+      - **最早威胁Time:** {{ .EarliestThreat }}
+      - **最新威胁Time:** {{ .LatestThreat }}
+      - **狩猎ExecuteTime:** {{ .HuntTime }}
+      {{ end }}
+      
+      ## 🚨 可疑File威胁
+      
+      {{ range .SuspiciousFiles }}
+      {{ if eq .ThreatStatus "MALWARE_DETECTED" }}
+      ### ⚠️ 恶意FileDetection
+      
+      - **FilePath:** `{{ .FullPath }}`
+      - **恶意SoftwareName:** `{{ .MalwareName }}`
+      - **FileSize:** {{ .Size }} 字节
+      - **MD5:** `{{ .MD5 }}`
+      - **SHA256:** `{{ .SHA256 }}`
+      - **ModifyTime:** {{ .Mtime }}
+      
+      {{ end }}
+      {{ end }}
+      
+      ## 🔍 ProcessAnalysis威胁
+      
+      {{ range .ProcessAnalysis }}
+      {{ if eq .ThreatStatus "MALICIOUS_PROCESS" }}
+      ### ⚠️ 恶意ProcessDetection
+      
+      - **ProcessID:** {{ .Pid }}
+      - **ProcessName:** `{{ .Name }}`
+      - **Command行:** `{{ .CommandLine }}`
+      - **可ExecuteFile:** `{{ .Exe }}`
+      - **User:** {{ .Username }}
+      - **恶意SoftwareName:** `{{ .MalwareName }}`
+      - **CreateTime:** {{ .CreateTime }}
+      
+      {{ end }}
+      {{ end }}
+      
+      ## 📦 Network工件威胁
+      
+      {{ range .NetworkArtifacts }}
+      {{ if eq .ThreatStatus "MALICIOUS_ARCHIVE" }}
+      ### ⚠️ 恶意压缩FileDetection
+      
+      - **FilePath:** `{{ .FullPath }}`
+      - **恶意SoftwareName:** `{{ .MalwareName }}`
+      - **FileSize:** {{ .Size }} 字节
+      - **MD5:** `{{ .MD5 }}`
+      - **ModifyTime:** {{ .Mtime }}
+      
+      {{ end }}
+      {{ end }}
+      
+      ---
+      
+      ## 🛡️ 建议措施
+      
+      1. **立即隔离** 所HasDetection到的恶意File
+      2. **终止** 所Has恶意Process
+      3. **Update** 病毒Library和SecurityPolicy
+      4. **扫描** 整个System以确保清洁
+      5. **Monitor** Network流量和System行为
+      
+      *Report生成Time: {{ timestamp(epoch=now()) }}*

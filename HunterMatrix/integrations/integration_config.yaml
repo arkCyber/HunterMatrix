@@ -1,0 +1,219 @@
+# Velociraptor + HunterMatrix 集成ConfigurationFile
+
+# Velociraptor Configuration
+velociraptor:
+  # Velociraptor Service器地址
+  server_url: "https://localhost:8000"
+  
+  # APIKey (从Velociraptor管理Interface获取)
+  api_key: ""
+  
+  # CertificatePath (可选)
+  cert_path: ""
+  
+  # ClientConfiguration
+  client:
+    # ClientID (可选，Automatic生成)
+    client_id: ""
+    
+    # ClientTag
+    labels:
+      - "huntermatrix-integration"
+      - "threat-hunting"
+      - "malware-detection"
+
+# HunterMatrix Configuration
+huntermatrix:
+  # 病毒LibraryPath
+  db_path: "/var/lib/huntermatrix"
+  
+  # HunterMatrix 可ExecuteFilePath
+  clamscan_path: "clamscan"
+  clamd_path: "clamd"
+  
+  # 扫描Configuration
+  scan_options:
+    # 最大FileSize (MB)
+    max_file_size: 100
+    
+    # 扫描超时 (秒)
+    timeout: 300
+    
+    # 是否扫描压缩File
+    scan_archives: true
+    
+    # 是否递归扫描
+    recursive: true
+    
+    # 要扫描的File扩展名
+    file_extensions:
+      - "exe"
+      - "dll"
+      - "scr"
+      - "bat"
+      - "cmd"
+      - "com"
+      - "pif"
+      - "vbs"
+      - "js"
+      - "jar"
+      - "zip"
+      - "rar"
+      - "7z"
+
+# 威胁狩猎Configuration
+hunting:
+  # 是否启用威胁狩猎
+  enabled: true
+  
+  # 狩猎间隔 (秒)
+  interval: 300
+  
+  # 狩猎Rules
+  rules:
+    # 可疑DownloadFile
+    suspicious_downloads:
+      enabled: true
+      priority: "high"
+      paths:
+        - "C:\\Users\\**\\Downloads\\*.exe"
+        - "C:\\Users\\**\\Downloads\\*.zip"
+        - "C:\\Users\\**\\Downloads\\*.rar"
+      time_range: 3600  # 1小时内的File
+      min_size: 1000    # 最小FileSize
+      max_size: 104857600  # 最大FileSize (100MB)
+    
+    # 临时Directory可ExecuteFile
+    temp_executables:
+      enabled: true
+      priority: "medium"
+      paths:
+        - "C:\\Temp\\*.exe"
+        - "C:\\Windows\\Temp\\*.exe"
+        - "C:\\Users\\**\\AppData\\Local\\Temp\\*.exe"
+      time_range: 1800  # 30分钟内的File
+    
+    # Start项Modify
+    startup_modifications:
+      enabled: true
+      priority: "high"
+      registry_keys:
+        - "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\**"
+        - "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\**"
+    
+    # 可疑Process
+    suspicious_processes:
+      enabled: true
+      priority: "high"
+      process_patterns:
+        - "(?i)(temp|tmp|cache|update|install|setup|download)"
+        - "(?i)(powershell|cmd|wscript|cscript|regsvr32|rundll32)"
+      path_patterns:
+        - "(?i)(temp|tmp|appdata|programdata)"
+
+# LogConfiguration
+logging:
+  # LogLevel
+  level: "INFO"
+  
+  # LogFilePath
+  file: "velociraptor_huntermatrix.log"
+  
+  # Log轮转
+  rotation:
+    max_size: "10MB"
+    max_files: 5
+  
+  # LogFormat
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# ReportConfiguration
+reporting:
+  # ReportOutputDirectory
+  output_dir: "reports"
+  
+  # ReportFormat
+  formats:
+    - "json"
+    - "html"
+    - "csv"
+  
+  # Report生成间隔 (秒)
+  interval: 3600
+  
+  # 保留Report天数
+  retention_days: 30
+  
+  # 邮件通知 (可选)
+  email:
+    enabled: false
+    smtp_server: "smtp.example.com"
+    smtp_port: 587
+    username: ""
+    password: ""
+    from_address: "security@example.com"
+    to_addresses:
+      - "admin@example.com"
+    
+    # 触发邮件的威胁Level
+    alert_threshold: "high"
+
+# PerformanceConfiguration
+performance:
+  # 最大并发扫描数
+  max_concurrent_scans: 5
+  
+  # 扫描QueueSize
+  scan_queue_size: 100
+  
+  # Memory限制 (MB)
+  memory_limit: 1024
+  
+  # CPU限制 (百分比)
+  cpu_limit: 80
+
+# 集成Configuration
+integration:
+  # WebInterface端口
+  web_port: 8082
+  
+  # API端口
+  api_port: 8083
+  
+  # 是否启用WebInterface
+  web_enabled: true
+  
+  # 是否启用API
+  api_enabled: true
+  
+  # AuthenticationConfiguration
+  auth:
+    enabled: true
+    username: "admin"
+    password: "changeme"
+    
+  # HTTPSConfiguration
+  https:
+    enabled: false
+    cert_file: ""
+    key_file: ""
+
+# DataLibraryConfiguration (用于StorageResult)
+database:
+  # DataLibraryType (sqlite, postgresql, mysql)
+  type: "sqlite"
+  
+  # SQLiteConfiguration
+  sqlite:
+    file: "velociraptor_huntermatrix.db"
+  
+  # PostgreSQLConfiguration (如果使用)
+  postgresql:
+    host: "localhost"
+    port: 5432
+    database: "velociraptor_huntermatrix"
+    username: ""
+    password: ""
+  
+  # Data保留天数
+  retention_days: 90

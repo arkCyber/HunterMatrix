@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主题切换测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // 立即执行主题设置 - 在Tailwind加载之前
+        (function() {
+            var savedTheme = localStorage.getItem('theme');
+            // 如果没有保存的主题，默认设置为暗色模式
+            if (!savedTheme) {
+                localStorage.setItem('theme', 'dark');
+                savedTheme = 'dark';
+            }
+            
+            // 根据保存的主题设置初始状态
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else if (savedTheme === 'auto') {
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+        })();
+        
+        tailwind.config = {
+            darkMode: 'class'
+        };
+    </script>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <div class="container mx-auto p-8">
+        <h1 class="text-3xl font-bold mb-8">主题切换测试</h1>
+        
+        <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg mb-6">
+            <h2 class="text-xl font-semibold mb-4">当前主题状态</h2>
+            <p>当前主题: <span id="current-theme" class="font-mono bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded"></span></p>
+            <p>HTML类: <span id="html-classes" class="font-mono bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded"></span></p>
+        </div>
+        
+        <div class="space-x-4 mb-6">
+            <button id="theme-toggle" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                <i class="fas fa-moon"></i> 切换主题
+            </button>
+            <button onclick="setTheme('dark')" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg">
+                <i class="fas fa-moon"></i> 暗色模式
+            </button>
+            <button onclick="setTheme('light')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg">
+                <i class="fas fa-sun"></i> 亮色模式
+            </button>
+            <button onclick="setTheme('auto')" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg">
+                <i class="fas fa-magic"></i> 跟随系统
+            </button>
+        </div>
+        
+        <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-4">测试内容</h3>
+            <p class="mb-4">这是一个测试段落，用来验证暗色和亮色模式的显示效果。</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-blue-600 dark:text-blue-400">卡片1</h4>
+                    <p class="text-gray-600 dark:text-gray-300">这是卡片内容</p>
+                </div>
+                <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-green-600 dark:text-green-400">卡片2</h4>
+                    <p class="text-gray-600 dark:text-gray-300">这是卡片内容</p>
+                </div>
+                <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-red-600 dark:text-red-400">卡片3</h4>
+                    <p class="text-gray-600 dark:text-gray-300">这是卡片内容</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 主题切换功能
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('theme') || 'dark';
+            const themes = ['dark', 'light', 'auto'];
+            const currentIndex = themes.indexOf(currentTheme);
+            const nextIndex = (currentIndex + 1) % themes.length;
+            const nextTheme = themes[nextIndex];
+            
+            setTheme(nextTheme);
+            updateThemeIcon();
+            updateStatus();
+            
+            console.log(`主题切换: ${currentTheme} -> ${nextTheme}`);
+        }
+        
+        function setTheme(theme) {
+            localStorage.setItem('theme', theme);
+            
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                // 跟随系统
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+            
+            updateThemeIcon();
+            updateStatus();
+            
+            console.log(`设置主题: ${theme}`);
+        }
+        
+        function updateThemeIcon() {
+            const themeToggle = document.getElementById('theme-toggle');
+            if (!themeToggle) return;
+            
+            const currentTheme = localStorage.getItem('theme') || 'dark';
+            const icons = themeToggle.querySelectorAll('i');
+            
+            // 清除所有图标
+            icons.forEach(icon => icon.remove());
+            
+            // 根据当前主题添加对应图标
+            const iconClass = {
+                'auto': 'fas fa-magic',
+                'light': 'fas fa-sun',
+                'dark': 'fas fa-moon'
+            };
+            
+            const newIcon = document.createElement('i');
+            newIcon.className = iconClass[currentTheme];
+            themeToggle.appendChild(newIcon);
+            
+            // 更新按钮文本
+            const themeNames = {
+                'dark': '暗色模式',
+                'light': '亮色模式',
+                'auto': '跟随系统'
+            };
+            themeToggle.innerHTML = newIcon.outerHTML + ' ' + themeNames[currentTheme];
+        }
+        
+        function updateStatus() {
+            const currentTheme = localStorage.getItem('theme') || 'dark';
+            const htmlClasses = document.documentElement.className;
+            
+            document.getElementById('current-theme').textContent = currentTheme;
+            document.getElementById('html-classes').textContent = htmlClasses;
+        }
+        
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定主题切换按钮
+            document.getElementById('theme-toggle').onclick = toggleTheme;
+            
+            // 更新状态显示
+            updateThemeIcon();
+            updateStatus();
+            
+            console.log('主题切换测试页面已加载');
+        });
+    </script>
+</body>
+</html>

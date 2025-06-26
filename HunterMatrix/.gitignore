@@ -1,0 +1,252 @@
+# HunterMatrix AI智能安全平台 - Git忽略文件
+
+# ===== 构建输出 =====
+build/
+target/
+dist/
+out/
+*.o
+*.so
+*.dylib
+*.dll
+*.exe
+*.app
+*.dmg
+*.pkg
+*.deb
+*.rpm
+
+# ===== 编译缓存 =====
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+!cmake/
+
+# ===== Rust 相关 =====
+Cargo.lock
+target/
+**/*.rs.bk
+*.pdb
+
+# ===== Python 相关 =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.env
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# ===== Node.js 相关 =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+.node_repl_history
+*.tgz
+.yarn-cache/
+.pnp.*
+
+# ===== 日志文件 =====
+*.log
+logs/
+*.log.*
+freshclam.log
+clamd.log
+scan.log
+ai_service.log
+
+# ===== 临时文件 =====
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.directory
+.Trash-*
+
+# ===== 配置文件 (包含敏感信息) =====
+*.conf
+!*.conf.sample
+!*.conf.example
+config.json
+settings.json
+.env.local
+.env.production
+email_config.yaml
+matrix_config.toml
+api_keys.json
+
+# ===== 数据库文件 =====
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# ===== 病毒库和扫描数据 =====
+virus_database/*.cvd
+virus_database/*.cld
+virus_database/*.dat
+virus_database/freshclam.log
+scan_results/
+quarantine/
+*.quarantine
+
+# ===== AI模型和数据 =====
+models/
+*.model
+*.bin
+*.onnx
+*.pt
+*.pth
+ai_cache/
+training_data/
+
+# ===== 测试输出 =====
+test_results/
+coverage/
+.nyc_output/
+junit.xml
+test-results.xml
+
+# ===== IDE 和编辑器 =====
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.atom/
+.brackets.json
+*.code-workspace
+
+# ===== 系统文件 =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ===== 备份文件 =====
+*.bak
+*.backup
+*.old
+*_backup
+*_old
+*.orig
+
+# ===== 压缩文件 =====
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.rar
+*.7z
+
+# ===== 文档生成 =====
+docs/_build/
+docs/html/
+docs/latex/
+*.pdf
+*.epub
+
+# ===== 安装包 =====
+*.msi
+*.pkg
+*.deb
+*.rpm
+*.snap
+*.flatpak
+
+# ===== 证书和密钥 =====
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+private_key*
+public_key*
+ssl/
+
+# ===== 本地开发 =====
+.local/
+.cache/
+.config/
+local_settings.py
+development.json
+debug.log
+
+# ===== 特定于HunterMatrix的忽略 =====
+# Web UI 临时文件
+web-ui/temp/
+web-ui/cache/
+web-ui/*.backup.html
+
+# AI服务临时文件
+ai-security/temp/
+ai-security/cache/
+ai-security/models/
+
+# 集成服务临时文件
+integrations/temp/
+integrations/cache/
+
+# 用户数据
+user_data/
+user_configs/
+user_reports/
+
+# 性能测试结果
+benchmark_results/
+performance_logs/
+
+# 自定义规则文件
+custom_rules/
+user_signatures/
+
+# 网络监控数据
+network_logs/
+traffic_data/
+
+# 邮件队列
+mail_queue/
+email_logs/
+
+# 矩阵消息队列
+matrix_queue/
+matrix_logs/
+
+# 保留重要的示例文件
+!example_config.json
+!sample_settings.yaml
+!demo_data/
+!test_data/
+
+# 但忽略实际的用户数据
+actual_data/
+production_data/
+real_configs/

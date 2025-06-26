@@ -1,0 +1,267 @@
+# AISecurityReport生成器ConfigurationFile
+
+# 定时TaskConfiguration
+schedule:
+  # 每日ReportTime (24小时制)
+  daily_report_time: "08:00"
+  
+  # 周报生成Date和Time
+  weekly_report_day: "monday"
+  weekly_report_time: "09:00"
+  
+  # 时区Settings
+  timezone: "Asia/Shanghai"
+  
+  # 紧急Report阈值 (威胁评分超过此值立即生成Report)
+  emergency_threshold: 0.9
+
+# 邮件Configuration
+email:
+  # 是否启用邮件Send
+  enabled: true
+  
+  # SMTPService器Configuration
+  smtp_server: "smtp.gmail.com"
+  smtp_port: 587
+  
+  # 邮箱AuthenticationInformation
+  username: "your-email@gmail.com"
+  password: "your-app-password"
+  
+  # 发件人地址
+  from_address: "security@yourcompany.com"
+  
+  # 收件人列Table
+  to_addresses:
+    - "admin@yourcompany.com"
+    - "security-team@yourcompany.com"
+    - "cto@yourcompany.com"
+  
+  # 邮件Theme前缀
+  subject_prefix: "[AISecurityReport]"
+  
+  # 紧急威胁邮件Configuration
+  emergency_emails:
+    - "emergency@yourcompany.com"
+    - "ciso@yourcompany.com"
+
+# Report生成Configuration
+report:
+  # ReportOutputDirectory
+  output_dir: "reports"
+  
+  # ReportFormat (支持: html, json, txt, pdf)
+  formats:
+    - "html"
+    - "json"
+    - "txt"
+  
+  # 是否Package含图Table
+  include_charts: true
+  
+  # 是否Package含AI建议
+  include_recommendations: true
+  
+  # 威胁Package含阈值 (只Report超过此阈值的威胁)
+  threat_threshold: 0.5
+  
+  # Report保留天数
+  max_report_age_days: 90
+  
+  # ReportLanguage
+  language: "zh-CN"
+  
+  # 详细程度 (basic, detailed, comprehensive)
+  detail_level: "detailed"
+
+# AIAnalysisConfiguration
+ai:
+  # 是否启用AIAnalysis
+  enabled: true
+  
+  # AnalysisDepth (basic, detailed, comprehensive)
+  analysis_depth: "detailed"
+  
+  # 是否Package含PredictionAnalysis
+  include_predictions: true
+  
+  # AI置信度阈值
+  confidence_threshold: 0.8
+  
+  # 是否启用趋势Analysis
+  trend_analysis: true
+  
+  # 历史DataAnalysis天数
+  historical_days: 30
+
+# Data源Configuration
+data_sources:
+  # HunterMatrixLogPath
+  huntermatrix_logs:
+    - "/var/log/huntermatrix/huntermatrix.log"
+    - "/var/log/huntermatrix/freshclam.log"
+  
+  # SystemLogPath
+  system_logs:
+    - "/var/log/system.log"
+    - "/var/log/security.log"
+  
+  # NetworkMonitorData
+  network_data:
+    enabled: true
+    interface: "en0"
+    
+  # VelociraptorData源
+  velociraptor:
+    enabled: true
+    server_url: "https://localhost:8000"
+    api_key: ""
+
+# 威胁分ClassConfiguration
+threat_categories:
+  critical:
+    threshold: 0.9
+    color: "#dc3545"
+    actions:
+      - "immediate_isolation"
+      - "emergency_notification"
+      - "detailed_analysis"
+  
+  high:
+    threshold: 0.7
+    color: "#fd7e14"
+    actions:
+      - "quarantine"
+      - "notification"
+      - "investigation"
+  
+  medium:
+    threshold: 0.5
+    color: "#ffc107"
+    actions:
+      - "monitoring"
+      - "log_analysis"
+  
+  low:
+    threshold: 0.3
+    color: "#28a745"
+    actions:
+      - "logging"
+  
+  info:
+    threshold: 0.0
+    color: "#17a2b8"
+    actions:
+      - "record_only"
+
+# ReportTemplateConfiguration
+templates:
+  daily:
+    title: "每日SecurityReport"
+    sections:
+      - "executive_summary"
+      - "threat_overview"
+      - "scan_statistics"
+      - "network_events"
+      - "ai_insights"
+      - "recommendations"
+      - "system_health"
+    
+  weekly:
+    title: "周度SecurityReport"
+    sections:
+      - "executive_summary"
+      - "weekly_trends"
+      - "threat_analysis"
+      - "performance_metrics"
+      - "ai_predictions"
+      - "strategic_recommendations"
+    
+  monthly:
+    title: "月度SecurityReport"
+    sections:
+      - "executive_summary"
+      - "monthly_overview"
+      - "threat_landscape"
+      - "security_posture"
+      - "compliance_status"
+      - "budget_recommendations"
+
+# 通知Configuration
+notifications:
+  # 即时通知Configuration
+  instant:
+    enabled: true
+    channels:
+      - "email"
+      - "webhook"
+      - "sms"
+    
+    # WebhookConfiguration
+    webhook:
+      url: "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+      format: "slack"
+    
+    # SMSConfiguration (需要第三方Service)
+    sms:
+      enabled: false
+      provider: "twilio"
+      account_sid: ""
+      auth_token: ""
+      from_number: ""
+      to_numbers:
+        - "+1234567890"
+  
+  # 摘要通知Configuration
+  summary:
+    enabled: true
+    frequency: "daily"
+    time: "18:00"
+
+# PerformanceConfiguration
+performance:
+  # 最大并发Report生成数
+  max_concurrent_reports: 3
+  
+  # Report生成超时Time (秒)
+  generation_timeout: 300
+  
+  # Data收集超时Time (秒)
+  data_collection_timeout: 120
+  
+  # Memory限制 (MB)
+  memory_limit: 1024
+
+# SecurityConfiguration
+security:
+  # ReportEncryption
+  encryption:
+    enabled: false
+    algorithm: "AES-256"
+    key_file: "report_encryption.key"
+  
+  # 访问控制
+  access_control:
+    enabled: true
+    allowed_ips:
+      - "127.0.0.1"
+      - "192.168.1.0/24"
+  
+  # 审计Log
+  audit_log:
+    enabled: true
+    file: "report_audit.log"
+
+# DebugConfiguration
+debug:
+  # 是否启用Debug模式
+  enabled: false
+  
+  # LogLevel
+  log_level: "INFO"
+  
+  # 是否SaveDebugData
+  save_debug_data: false
+  
+  # DebugDataDirectory
+  debug_dir: "debug"

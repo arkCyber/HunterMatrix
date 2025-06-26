@@ -1,0 +1,102 @@
+{
+  "name": "huntermatrix",
+  "version": "1.0.0",
+  "description": "HunterMatrix - Intelligent Threat Hunting Platform powered by AI and HunterMatrix",
+  "main": "web-ui/huntermatrix_final.html",
+  "scripts": {
+    "start": "./start_huntermatrix.sh",
+    "dev": "cd web-ui && python3 start_server.py",
+    "build": "mkdir -p build && cd build && cmake .. && make",
+    "test": "./test_scanning.sh && python -m pytest ai-security/tests/",
+    "test:web": "cd web-ui && node test_ui.js",
+    "test:ai": "cd ai-security && python -m pytest tests/",
+    "test:rust": "cargo test",
+    "lint": "eslint web-ui/*.js && flake8 ai-security/ && cargo clippy",
+    "format": "prettier --write web-ui/*.js && black ai-security/ && cargo fmt",
+    "docs": "cd docs && make html",
+    "clean": "rm -rf build/ target/ __pycache__/ .pytest_cache/",
+    "install:deps": "pip install -r ai-security/requirements.txt && cargo build",
+    "setup": "chmod +x *.sh && ./setup_permissions.sh",
+    "demo": "./demo_ai_reports.sh",
+    "update:virus-db": "freshclam --config-file=freshclam.conf",
+    "backup": "tar -czf huntermatrix-backup-$(date +%Y%m%d).tar.gz --exclude=build --exclude=target .",
+    "release": "npm run test && npm run build && npm run docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arkCyber/HunterMatrix.git"
+  },
+  "keywords": [
+    "antivirus",
+    "security",
+    "ai",
+    "huntermatrix",
+    "malware-detection",
+    "threat-intelligence",
+    "cybersecurity",
+    "virus-scanner",
+    "network-monitoring",
+    "ai-assistant",
+    "security-platform",
+    "rust",
+    "python",
+    "javascript",
+    "tauri",
+    "web-ui"
+  ],
+  "author": {
+    "name": "arkSong",
+    "email": "arksong2018@gmail.com",
+    "url": "https://github.com/arkCyber"
+  },
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/arkCyber/HunterMatrix/issues"
+  },
+  "homepage": "https://github.com/arkCyber/HunterMatrix#readme",
+  "engines": {
+    "node": ">=14.0.0",
+    "python": ">=3.8.0",
+    "rust": ">=1.70.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "jest": "^29.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "ws": "^8.0.0",
+    "cors": "^2.8.5"
+  },
+  "optionalDependencies": {
+    "tailwindcss": "^3.0.0",
+    "autoprefixer": "^10.0.0",
+    "postcss": "^8.0.0"
+  },
+  "peerDependencies": {
+    "cmake": ">=3.16.0",
+    "python3": ">=3.8.0",
+    "rust": ">=1.70.0"
+  },
+  "config": {
+    "port": 8083,
+    "host": "localhost",
+    "ai_service_port": 8084,
+    "clamd_socket": "/tmp/clamd.socket"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/arkCyber"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
+}

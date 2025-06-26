@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>威胁告警</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #dc3545;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #dc3545;
+            margin: 0;
+            font-size: 28px;
+        }
+        .alert-danger {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .threat-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .detail-value {
+            color: #212529;
+        }
+        .severity-critical { color: #dc3545; font-weight: bold; }
+        .severity-high { color: #fd7e14; font-weight: bold; }
+        .severity-medium { color: #ffc107; font-weight: bold; }
+        .severity-low { color: #28a745; font-weight: bold; }
+        .confidence-bar {
+            background: #e9ecef;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
+            transition: width 0.3s ease;
+        }
+        .actions-list {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #dc3545;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+            font-weight: 600;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 威胁告警</h1>
+            <div class="subtitle">检测到安全威胁，需要立即关注</div>
+        </div>
+        
+        <div class="alert-danger">
+            <strong>🚨 威胁告警</strong><br>
+            检测到 {{threat.severity}} 级别威胁，需要立即关注和处理。
+        </div>
+
+        <div class="threat-details">
+            <h3>🔍 威胁详情</h3>
+            
+            <div class="detail-row">
+                <span class="detail-label">威胁类型</span>
+                <span class="detail-value">{{threat.threat_type}}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">严重程度</span>
+                <span class="detail-value">
+                    {{#if (eq threat.severity "critical")}}
+                        <span class="severity-critical">🔴 严重</span>
+                    {{else if (eq threat.severity "high")}}
+                        <span class="severity-high">🟠 高危</span>
+                    {{else if (eq threat.severity "medium")}}
+                        <span class="severity-medium">🟡 中危</span>
+                    {{else}}
+                        <span class="severity-low">🟢 低危</span>
+                    {{/if}}
+                </span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">检测时间</span>
+                <span class="detail-value">{{threat.detection_time}}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">文件路径</span>
+                <span class="detail-value"><code>{{threat.file_path}}</code></span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">AI置信度</span>
+                <span class="detail-value">
+                    {{threat.confidence}}%
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: {{threat.confidence}}%"></div>
+                    </div>
+                </span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">处理状态</span>
+                <span class="detail-value">{{threat.status}}</span>
+            </div>
+        </div>
+
+        <div class="actions-list">
+            <h3>⚡ 建议措施</h3>
+            <ol>
+                <li>立即隔离可疑文件</li>
+                <li>进行深度系统扫描</li>
+                <li>检查相关系统文件</li>
+                <li>更新病毒库到最新版本</li>
+                <li>监控系统异常活动</li>
+            </ol>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{{dashboard_url}}#incident/{{threat.id}}" class="btn">查看事件详情</a>
+            <a href="{{dashboard_url}}#response/{{threat.id}}" class="btn btn-secondary">启动响应流程</a>
+        </div>
+        
+        <div class="footer">
+            <p>此邮件由AI安全助手自动生成 | {{timestamp}}</p>
+            <p>紧急联系: security@company.com | 热线: +1-800-SECURITY</p>
+        </div>
+    </div>
+</body>
+</html>

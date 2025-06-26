@@ -1,0 +1,94 @@
+[package]
+name = "huntermatrix"
+version = "1.0.0"
+description = "HunterMatrix - Intelligent Threat Hunting Platform"
+authors = ["arkSong <arksong2018@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/arkCyber/MCP-ChatBot"
+default-run = "huntermatrix"
+edition = "2021"
+rust-version = "1.60"
+
+[lib]
+name = "huntermatrix"
+path = "src/lib.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+tauri-build = { version = "2.0.1", features = [] }
+
+[dependencies]
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+tauri = { version = "2.0.1", features = ["macos-private-api"] }
+tauri-plugin-shell = "2.0.1"
+tauri-plugin-dialog = "2.0.1"
+chrono = { version = "0.4", features = ["serde"] }
+
+# AsyncRun时
+tokio = { version = "1.0", features = ["full"] }
+
+# HTTPClient
+reqwest = { version = "0.11", features = ["json"] }
+
+# ErrorProcess
+anyhow = "1.0"
+thiserror = "1.0"
+
+# UUID生成
+uuid = { version = "1.0", features = ["v4"] }
+
+# 邮件Send
+lettre = { version = "0.11", features = [
+    "tokio1-native-tls",
+    "smtp-transport",
+    "builder",
+    "hostname",
+    "pool",
+] }
+
+# Template引擎
+handlebars = "4.4"
+
+# ConfigurationFile
+config = "0.13"
+toml = "0.8"
+
+# Log
+log = "0.4"
+env_logger = "0.10"
+
+# FileSystem
+dirs = "5.0"
+
+# Base64编码
+base64 = "0.21"
+
+# PasswordInput
+rpassword = "7.0"
+
+# MatrixClient
+matrix-sdk = { version = "0.7", features = ["e2e-encryption", "markdown"] }
+url = "2.4"
+
+# JSONProcess
+serde_yaml = "0.9"
+
+[[bin]]
+name = "huntermatrix"
+path = "src/main.rs"
+
+[[bin]]
+name = "setup_email"
+path = "src/bin/setup_email.rs"
+
+[[bin]]
+name = "setup_matrix"
+path = "src/bin/setup_matrix.rs"
+
+[[bin]]
+name = "test_matrix"
+path = "src/bin/test_matrix.rs"
+
+[workspace]

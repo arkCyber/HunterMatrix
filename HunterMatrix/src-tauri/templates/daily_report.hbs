@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+            font-size: 28px;
+        }
+        .header .subtitle {
+            color: #666;
+            margin-top: 5px;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .alert-info { background: #d1ecf1; border-left: 4px solid #17a2b8; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+        .severity-high { color: #dc3545; }
+        .severity-medium { color: #ffc107; }
+        .severity-low { color: #28a745; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 {{title}}</h1>
+            <div class="subtitle">{{subtitle}}</div>
+        </div>
+        
+        <div class="alert alert-info">
+            <strong>📊 每日安全报告摘要</strong><br>
+            今日系统安全状况总体{{#if (eq threat_level "low")}}良好{{else}}需要关注{{/if}}，
+            共检测到 {{total_threats}} 个威胁，已处理 {{handled_threats}} 个。
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{scanned_files}}</div>
+                <div class="stat-label">扫描文件数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{total_threats}}</div>
+                <div class="stat-label">检测威胁</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{scan_time}}s</div>
+                <div class="stat-label">平均扫描时间</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{success_rate}}%</div>
+                <div class="stat-label">检测成功率</div>
+            </div>
+        </div>
+
+        {{#if threats}}
+        <h3>🚨 今日威胁检测</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>威胁类型</th>
+                    <th>文件路径</th>
+                    <th>严重程度</th>
+                    <th>处理状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each threats}}
+                <tr>
+                    <td>{{this.threat_type}}</td>
+                    <td>{{this.file_path}}</td>
+                    <td>
+                        {{#if (eq this.severity "high")}}
+                            <span class="severity-high">🔴 高危</span>
+                        {{else if (eq this.severity "medium")}}
+                            <span class="severity-medium">🟡 中危</span>
+                        {{else}}
+                            <span class="severity-low">🟢 低危</span>
+                        {{/if}}
+                    </td>
+                    <td>{{this.status}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{/if}}
+
+        <h3>🧠 AI分析洞察</h3>
+        <ul>
+            {{#each ai_insights}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+
+        <h3>💡 安全建议</h3>
+        <ul>
+            {{#each recommendations}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+
+        {{#if system_info}}
+        <h3>📊 系统状态</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{system_info.cpu_usage}}%</div>
+                <div class="stat-label">CPU使用率</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{system_info.memory_usage}}%</div>
+                <div class="stat-label">内存使用率</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{system_info.disk_usage}}%</div>
+                <div class="stat-label">磁盘使用率</div>
+            </div>
+        </div>
+        {{/if}}
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="http://localhost:8080" class="btn">查看详细报告</a>
+            <a href="http://localhost:8080#settings" class="btn" style="background: #6c757d;">系统设置</a>
+        </div>
+        
+        <div class="footer">
+            <p>此邮件由AI安全助手自动生成 | {{timestamp}}</p>
+            <p>如有问题，请联系安全团队</p>
+        </div>
+    </div>
+</body>
+</html>
